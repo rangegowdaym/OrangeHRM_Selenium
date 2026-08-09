@@ -13,7 +13,8 @@ echo ============================================
 echo  Generating Allure Report
 echo ============================================
 
-npx --yes allure generate target/allure-results --output target/allure-report
+set "REPORT_NAME=OrangeHRM regression / chrome"
+npx --yes allure generate target/allure-results --config ./allurerc.mjs
 
 echo ============================================
 echo  Opening Allure Report

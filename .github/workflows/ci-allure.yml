@@ -168,6 +168,8 @@ jobs:
     needs:
       - test-linux
     if: always()
+    env:
+      REPORT_NAME: ${{ format('OrangeHRM {0} / {1}', github.event_name == 'workflow_dispatch' && inputs.suite || 'smoke', github.event_name == 'workflow_dispatch' && inputs.browser || 'chrome') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -182,7 +184,7 @@ jobs:
           merge-multiple: true
 
       - name: Build Allure 3 report
-        run: npx --yes allure generate allure-results
+        run: npx --yes allure generate allure-results --config ./allurerc.mjs
 
       - name: Publish report to GitHub Pages
         if: github.event_name != 'pull_request'

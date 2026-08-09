@@ -23,12 +23,13 @@ echo "============================================"
 echo " Generating Allure Report"
 echo "============================================"
 
-npx --yes allure generate target/allure-results --output target/allure-report
+export REPORT_NAME="OrangeHRM smoke / chrome"
+npx --yes allure generate target/allure-results --config ./allurerc.mjs
 
 echo "============================================"
 echo " Opening Allure Report"
 echo "============================================"
 
-npx --yes allure open target/allure-report
+npx --yes allure open target/allure-report/awesome
 
 exit $TEST_EXIT_CODE
