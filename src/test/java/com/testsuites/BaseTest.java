@@ -1,20 +1,14 @@
 package com.testsuites;
 
-import com.common.helpers.PageObjectManager;
 import com.common.helpers.TestContext;
 import com.reports.AllureReportUtils;
 import com.ui.driverfactory.DriverManager;
-import com.ui.helpers.ScreenshotHelper;
 import com.utils.ConfigReader;
 import io.qameta.allure.Allure;
 import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
 import org.testng.Reporter;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
+import org.testng.annotations.*;
 
 public abstract class BaseTest {
     protected WebDriver driver;
@@ -66,9 +60,9 @@ public abstract class BaseTest {
         AllureReportUtils.attachScreenshot(this.driver, screenshotName);
     }
 
-    protected WebDriver getDriver() {
+    /*protected WebDriver getDriver() {
         return driver;
-    }
+    }*/
 
     private String firstNonBlank(String... values) {
         for (String value : values) {
