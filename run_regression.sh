@@ -18,7 +18,7 @@ echo " Generating Allure Report"
 echo "============================================"
 
 export REPORT_NAME="OrangeHRM regression / chrome"
-npx --yes allure generate target/allure-results --config ./allurerc.mjs
+npx --yes allure generate target/allure-results --report-name "$REPORT_NAME" --output target/allure-report
 
 echo "============================================"
 echo " Opening Allure Report"

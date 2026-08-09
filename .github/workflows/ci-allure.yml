@@ -184,7 +184,7 @@ jobs:
           merge-multiple: true
 
       - name: Build Allure 3 report
-        run: npx --yes allure generate allure-results --config ./allurerc.mjs
+        run: npx --yes allure generate allure-results --report-name "${REPORT_NAME}" --output target/allure-report
 
       - name: Publish report to GitHub Pages
         if: github.event_name != 'pull_request'
