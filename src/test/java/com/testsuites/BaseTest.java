@@ -1,5 +1,7 @@
 package com.testsuites;
 
+import com.common.helpers.PageObjectManager;
+import com.common.helpers.TestContext;
 import com.reports.AllureReportUtils;
 import com.ui.driverfactory.DriverManager;
 import com.ui.helpers.ScreenshotHelper;
@@ -16,34 +18,33 @@ import org.testng.annotations.Parameters;
 
 public abstract class BaseTest {
     protected WebDriver driver;
-    protected ScreenshotHelper screenshotHelper;
+    protected TestContext testContext;
 
-    @BeforeSuite(alwaysRun = true)
-    public void loadConfiguration() {
+    static {
         String projectDir = System.getProperty("user.dir");
-        String env = System.getProperty("env", "qa");
+        String env = System.getProperty("env", "dev");
         String globalConfig = projectDir + "/src/test/resources/config/global.properties";
         String envConfig = projectDir + "/src/test/resources/config/" + env + ".properties";
         ConfigReader.loadAllProperties(globalConfig, envConfig);
+    }
+
+    @BeforeSuite(alwaysRun = true)
+    public void loadConfiguration() {
+        testContext = new TestContext();
     }
 
     @BeforeMethod(alwaysRun = true)
     @Parameters({"platform", "browser", "browserVersion"})
     public void setUp(@Optional String platform, @Optional String browser, @Optional String browserVersion) {
         driver = DriverManager.getInstance().getDriver(platform, browser, browserVersion);
-        screenshotHelper = new ScreenshotHelper(driver);
+        testContext.setScreenshotHelper(driver);
         logStep("Driver initialized");
     }
 
     @AfterMethod(alwaysRun = true)
     public void tearDown(ITestResult result) {
-        if (!result.isSuccess() && screenshotHelper != null) {
-            AllureReportUtils.attachBytes(
-                    "Failure screenshot",
-                    screenshotHelper.getScreenshotAsByteArray(),
-                    "image/png",
-                    ".png"
-            );
+        if (!result.isSuccess() && testContext.getScreenshotHelper() != null) {
+            AllureReportUtils.attachScreenshot(this.driver, "Failed Screenshot");
         }
         DriverManager.getInstance().quitDriver();
     }
@@ -55,6 +56,10 @@ public abstract class BaseTest {
 
     protected void attachText(String name, String value) {
         AllureReportUtils.attachText(name, value);
+    }
+
+    protected void attachScreenshot(String screenshotName) {
+        AllureReportUtils.attachScreenshot(this.driver, screenshotName);
     }
 
     protected WebDriver getDriver() {

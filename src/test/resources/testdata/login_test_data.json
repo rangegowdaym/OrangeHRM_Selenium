@@ -1,0 +1,24 @@
+{
+  "invalidCredentials": [
+    {
+      "username": "invalidUser",
+      "password": "Admin1234!",
+      "scenario": "Wrong username"
+    },
+    {
+      "username": "Admin",
+      "password": "wrongPass!",
+      "scenario": "Wrong password"
+    },
+    {
+      "username": "ADMIN",
+      "password": "Admin1234!",
+      "scenario": "Username case sensitivity"
+    },
+    {
+      "username": "admin@#$",
+      "password": "Admin1234!",
+      "scenario": "Username with special chars"
+    }
+  ]
+}

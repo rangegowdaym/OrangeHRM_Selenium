@@ -15,7 +15,7 @@ import java.io.IOException;
 public class ScreenshotHelper {
     private final TakesScreenshot screenshotTaker;
     private static final File SCREENSHOT_PATH = new File(System.getProperty("user.dir"),
-            ConfigReader.getString("screenshot.path"));
+            ConfigReader.getString("screenshots.path"));
 
     public ScreenshotHelper(WebDriver driver) {
         this.screenshotTaker = (TakesScreenshot) driver;

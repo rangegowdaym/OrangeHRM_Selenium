@@ -1,0 +1,85 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.orangehrm'
+version = 'v1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+def versions = [
+    selenium       : '4.46.0',
+    cucumber       : '7.34.6',
+    testng         : '7.12.0',
+    log4j          : '2.26.1',
+    commonsIo      : '2.22.0',
+    commonsLang3   : '3.20.0',
+    pdfbox         : '3.0.8',
+    poi            : '5.5.1',
+    jacksonDatabind: '2.22.1',
+    datafaker      : '2.7.0',
+    cucumberMessage: '34.2.0',
+    allure         : '2.35.4',
+    aspectj        : '1.9.24',
+    lombok         : '1.18.38'
+].asImmutable()
+
+def forwardedTestProperties = ['suiteXmlFile', 'groups', 'env', 'browser', 'platform'].asImmutable()
+
+dependencies {
+    compileOnly "org.projectlombok:lombok:${versions.lombok}"
+    annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
+    testCompileOnly "org.projectlombok:lombok:${versions.lombok}"
+    testAnnotationProcessor "org.projectlombok:lombok:${versions.lombok}"
+
+    implementation "io.cucumber:messages:${versions.cucumberMessage}"
+    implementation "org.seleniumhq.selenium:selenium-java:${versions.selenium}"
+    implementation "io.cucumber:cucumber-java:${versions.cucumber}"
+    implementation "io.cucumber:cucumber-testng:${versions.cucumber}"
+    implementation "io.cucumber:cucumber-picocontainer:${versions.cucumber}"
+    implementation "org.testng:testng:${versions.testng}"
+    implementation "org.apache.logging.log4j:log4j-core:${versions.log4j}"
+    implementation "org.apache.logging.log4j:log4j-api:${versions.log4j}"
+    implementation "commons-io:commons-io:${versions.commonsIo}"
+    implementation "org.apache.commons:commons-lang3:${versions.commonsLang3}"
+    implementation "org.apache.pdfbox:pdfbox:${versions.pdfbox}"
+    implementation "org.apache.poi:poi:${versions.poi}"
+    implementation "org.apache.poi:poi-ooxml:${versions.poi}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${versions.jacksonDatabind}"
+    implementation "net.datafaker:datafaker:${versions.datafaker}"
+    implementation "io.qameta.allure:allure-java-commons:${versions.allure}"
+    implementation "io.qameta.allure:allure-testng:${versions.allure}"
+    implementation "io.qameta.allure:allure-cucumber7-jvm:${versions.allure}"
+
+    testRuntimeOnly "org.aspectj:aspectjweaver:${versions.aspectj}"
+}
+
+layout.buildDirectory.set(layout.projectDirectory.dir('target'))
+
+tasks.withType(Test).configureEach {
+    useTestNG {
+        listeners << 'io.qameta.allure.testng.AllureTestNg'
+        listeners << 'com.reports.AllureTestNgListener'
+        listeners << 'com.testng.DisableRetryTransformer'
+
+        def suiteXml = providers.systemProperty('suiteXmlFile').orNull?.trim()
+        if (suiteXml) {
+            suites suiteXml
+        }
+    }
+
+    forwardedTestProperties.each { key ->
+        def value = providers.systemProperty(key).orNull?.trim()
+        if (value) {
+            systemProperty key, value
+        }
+    }
+}

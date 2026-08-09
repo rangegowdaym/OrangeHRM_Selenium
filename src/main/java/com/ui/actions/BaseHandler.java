@@ -52,6 +52,10 @@ public class BaseHandler {
         logger.info("Page refreshed successfully");
     }
 
+    public boolean isElementDisplayed(Object locator) {
+        return resolveElement(locator).isDisplayed();
+    }
+
     public boolean waitForElementInvisible(Object locator) {
         return Boolean.TRUE.equals(performFunctionAction(locator,
                 element -> wait.until(ExpectedConditions.invisibilityOf(element)),
@@ -62,6 +66,15 @@ public class BaseHandler {
         return Boolean.TRUE.equals(performFunctionAction(locator,
                 element -> wait.until(ExpectedConditions.textToBePresentInElement(element, text)),
                 "Text not found in element: " + locator + " with text: " + text));
+    }
+
+    public boolean waitForUrlContains(String urlFragment) {
+        try {
+            return Boolean.TRUE.equals(wait.until(ExpectedConditions.urlContains(urlFragment)));
+        } catch (WebDriverException e) {
+            handleException(e, "URL did not contain expected value: " + urlFragment);
+            return false;
+        }
     }
 
     public WebElement waitForElementToBeClickable(Object locator) {

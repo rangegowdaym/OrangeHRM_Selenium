@@ -1,0 +1,165 @@
+stages:
+  - build
+  - test
+  - report
+  - deploy
+
+variables:
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+  SUITE:
+    value: "smoke"
+    description: "Suite to run: smoke or regression"
+    options:
+      - "smoke"
+      - "regression"
+  BROWSER:
+    value: "chrome"
+    description: "Browser to run: chrome, firefox, edge, safari, all"
+    options:
+      - "chrome"
+      - "firefox"
+      - "edge"
+      - "safari"
+      - "all"
+  TEST_ENV:
+    value: "dev"
+    description: "Environment to run against"
+    options:
+      - "dev"
+      - "qa"
+      - "ppe"
+  PLATFORM:
+    value: "local"
+    description: "Execution platform"
+
+default:
+  image: eclipse-temurin:25-jdk
+  before_script:
+    - chmod +x ./gradlew
+
+cache:
+  key: gradle-cache
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+build:
+  stage: build
+  script:
+    - ./gradlew clean classes
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - target/
+
+test-chrome:
+  stage: test
+  image: selenium/standalone-chrome:latest
+  needs: ["build"]
+  rules:
+    - if: '$BROWSER == "chrome" || $BROWSER == "all"'
+  script:
+    - ./gradlew test -DsuiteXmlFile=${SUITE}.xml -Dgroups=${SUITE} -Denv=${TEST_ENV} -Dbrowser=chrome -Dplatform=${PLATFORM}
+  artifacts:
+    when: always
+    expire_in: 14 days
+    paths:
+      - target/allure-results/
+      - target/reports/
+      - target/test-results/
+
+test-firefox:
+  stage: test
+  image: selenium/standalone-firefox:latest
+  needs: ["build"]
+  rules:
+    - if: '$BROWSER == "firefox" || $BROWSER == "all"'
+  script:
+    - ./gradlew test -DsuiteXmlFile=${SUITE}.xml -Dgroups=${SUITE} -Denv=${TEST_ENV} -Dbrowser=firefox -Dplatform=${PLATFORM}
+  artifacts:
+    when: always
+    expire_in: 14 days
+    paths:
+      - target/allure-results/
+      - target/reports/
+      - target/test-results/
+
+test-edge:
+  stage: test
+  image: selenium/standalone-edge:latest
+  needs: ["build"]
+  rules:
+    - if: '$BROWSER == "edge" || $BROWSER == "all"'
+  script:
+    - ./gradlew test -DsuiteXmlFile=${SUITE}.xml -Dgroups=${SUITE} -Denv=${TEST_ENV} -Dbrowser=edge -Dplatform=${PLATFORM}
+  artifacts:
+    when: always
+    expire_in: 14 days
+    paths:
+      - target/allure-results/
+      - target/reports/
+      - target/test-results/
+
+test-safari:
+  stage: test
+  needs: ["build"]
+  rules:
+    - if: '$BROWSER == "safari" || $BROWSER == "all"'
+  script:
+    - |
+      if [ "${PLATFORM}" = "local" ]; then
+        echo "Safari is not available on Linux runners. Use PLATFORM=sauce_labs or PLATFORM=browser_stack for Safari."
+        exit 1
+      fi
+    - ./gradlew test -DsuiteXmlFile=${SUITE}.xml -Dgroups=${SUITE} -Denv=${TEST_ENV} -Dbrowser=safari -Dplatform=${PLATFORM}
+  artifacts:
+    when: always
+    expire_in: 14 days
+    paths:
+      - target/allure-results/
+      - target/reports/
+      - target/test-results/
+
+allure-report:
+  stage: report
+  needs:
+    - job: test-chrome
+      optional: true
+      artifacts: true
+    - job: test-firefox
+      optional: true
+      artifacts: true
+    - job: test-edge
+      optional: true
+      artifacts: true
+    - job: test-safari
+      optional: true
+      artifacts: true
+  before_script:
+    - apt-get update -y
+    - apt-get install -y curl tar
+    - curl -fsSL -o /tmp/allure.tgz https://github.com/allure-framework/allure2/releases/download/2.35.1/allure-2.35.1.tgz
+    - tar -xzf /tmp/allure.tgz -C /tmp
+  script:
+    - mkdir -p target/allure-report
+    - /tmp/allure-2.35.1/bin/allure generate target/allure-results --clean -o target/allure-report
+  artifacts:
+    when: always
+    expire_in: 14 days
+    paths:
+      - target/allure-report/
+      - target/allure-results/
+
+pages:
+  stage: deploy
+  needs: ["allure-report"]
+  script:
+    - mkdir -p public
+    - cp -R target/allure-report/. public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
+    - master

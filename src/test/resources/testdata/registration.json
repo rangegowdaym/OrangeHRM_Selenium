@@ -1,0 +1,10 @@
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "test.lambdatest005@gmail.com",
+  "telephone": "1234567890",
+  "password": "Test@1234",
+  "confirmPassword": "Test@1234",
+  "newsletterSubscription": true,
+  "privacyPolicyAgreed": true
+}

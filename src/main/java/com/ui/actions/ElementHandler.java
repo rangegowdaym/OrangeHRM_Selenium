@@ -2,6 +2,7 @@ package com.ui.actions;
 
 import com.utils.LoggerUtils;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -31,6 +32,7 @@ public class ElementHandler extends BaseHandler {
     public void enterText(Object locator, String text) {
         logger.info("Entering text in element: {} with text: {}", locator, text);
         performAction(locator, element -> {
+            waitForElementToBeClickable(element);
             element.clear();
             element.sendKeys(text);
         }, "Unable to enter text in the element: " + locator);
