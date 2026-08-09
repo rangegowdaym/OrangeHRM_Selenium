@@ -44,9 +44,7 @@ jobs:
   test-linux:
     name: Test (${{ matrix.browser }})
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name != 'workflow_dispatch' && matrix.browser == 'chrome') ||
-      (github.event_name == 'workflow_dispatch' && (inputs.browser == 'all' || inputs.browser == matrix.browser) && matrix.browser != 'safari')
+    if: github.event_name != 'workflow_dispatch' || (github.event_name == 'workflow_dispatch' && inputs.browser != 'safari')
     strategy:
       fail-fast: false
       matrix:
@@ -80,6 +78,9 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build and run tests
+        if: |
+          (github.event_name != 'workflow_dispatch' && matrix.browser == 'chrome') ||
+          (github.event_name == 'workflow_dispatch' && (inputs.browser == 'all' || inputs.browser == matrix.browser))
         run: |
           ./gradlew clean test \
             -DsuiteXmlFile=${SUITE}.xml \
@@ -89,7 +90,12 @@ jobs:
             -Dplatform=local
 
       - name: Upload Allure results
-        if: always()
+        if: |
+          always() &&
+          (
+            (github.event_name != 'workflow_dispatch' && matrix.browser == 'chrome') ||
+            (github.event_name == 'workflow_dispatch' && (inputs.browser == 'all' || inputs.browser == matrix.browser))
+          )
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-${{ matrix.browser }}
@@ -98,7 +104,12 @@ jobs:
           retention-days: 14
 
       - name: Upload test reports
-        if: always()
+        if: |
+          always() &&
+          (
+            (github.event_name != 'workflow_dispatch' && matrix.browser == 'chrome') ||
+            (github.event_name == 'workflow_dispatch' && (inputs.browser == 'all' || inputs.browser == matrix.browser))
+          )
         uses: actions/upload-artifact@v4
         with:
           name: test-reports-${{ matrix.browser }}
