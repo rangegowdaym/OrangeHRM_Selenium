@@ -42,7 +42,7 @@ public class LoginTest extends BaseTest {
     //  Happy path
     // ─────────────────────────────────────────────────────────────────────────
 
-    @Test(description = "VALID LOGIN", groups = {"smoke", "regression"})
+    @Test(description = "VALID LOGIN", groups = {"smoke"})
     @Story("Valid login")
     @Description("Verify that a user with valid credentials can log in successfully")
     @Severity(SeverityLevel.BLOCKER)

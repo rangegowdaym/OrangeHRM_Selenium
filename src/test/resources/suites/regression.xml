@@ -6,18 +6,12 @@
         <parameter name="platform" value="local"/>
         <groups>
             <run>
+                <include name="smoke"/>
                 <include name="regression"/>
             </run>
         </groups>
         <classes>
-            <class name="com.testsuites.LoginTest">
-                <methods>
-                    <include name="testInvalidCredentialsShowError"/>
-                    <include name="testEmptyCredentialsShowError"/>
-                    <include name="testEmptyUsernameShowsError"/>
-                    <include name="testEmptyPasswordShowsError"/>
-                </methods>
-            </class>
+            <class name="com.testsuites.LoginTest"/>
         </classes>
     </test>
 </suite>

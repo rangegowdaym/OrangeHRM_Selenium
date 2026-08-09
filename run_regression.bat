@@ -7,19 +7,19 @@ echo ============================================
 echo  Running Regression Tests
 echo ============================================
 
-call gradlew.bat clean test -DsuiteXmlFile=regression.xml -Dgroups=regression -Denv=qa -Dbrowser=chrome -Dplatform=local
+call gradlew.bat clean test -DsuiteXmlFile=src/test/resources/suites/regression.xml -Denv=qa -Dbrowser=chrome -Dplatform=local
 
 echo ============================================
 echo  Generating Allure Report
 echo ============================================
 
-allure generate --report-name "Orange HRM Regression" --output target/allure-report target/allure-results
+npx --yes allure generate target/allure-results --output target/allure-report
 
 echo ============================================
 echo  Opening Allure Report
 echo ============================================
 
-allure open target/allure-report
+npx --yes allure open target/allure-report/awesome
 
 pause
 endlocal

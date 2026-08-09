@@ -15,12 +15,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.testsuites.LoginTest">
-                <methods>
-                    <include name="testValidLogin"/>
-                    <include name="testLoginPageIsLoaded"/>
-                </methods>
-            </class>
+            <class name="com.testsuites.LoginTest"/>
         </classes>
     </test>
 </suite>

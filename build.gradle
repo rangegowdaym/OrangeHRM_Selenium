@@ -74,6 +74,9 @@ tasks.withType(Test).configureEach {
         if (suiteXml) {
             def suiteFile = rootProject.file(suiteXml)
             if (!suiteFile.exists()) {
+                suiteFile = rootProject.file("src/test/resources/suites/${suiteXml}")
+            }
+            if (!suiteFile.exists()) {
                 throw new GradleException("TestNG suite file not found: ${suiteFile}")
             }
             suites suiteFile

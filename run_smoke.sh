@@ -15,7 +15,7 @@ echo " Running Smoke Tests"
 echo "============================================"
 
 set +e
-./gradlew test -DsuiteXmlFile=smoke.xml -Dgroups=smoke -Denv=dev -Dbrowser=chrome -Dplatform=local
+./gradlew test -DsuiteXmlFile=src/test/resources/suites/smoke.xml -Denv=dev -Dbrowser=chrome -Dplatform=local
 TEST_EXIT_CODE=$?
 set -e
 

@@ -9,7 +9,7 @@ echo " Running Regression Tests"
 echo "============================================"
 
 set +e
-./gradlew clean test -DsuiteXmlFile=regression.xml -Dgroups=regression -Denv=qa -Dbrowser=chrome -Dplatform=local
+./gradlew clean test -DsuiteXmlFile=src/test/resources/suites/regression.xml -Denv=qa -Dbrowser=chrome -Dplatform=local
 TEST_EXIT_CODE=$?
 set -e
 
