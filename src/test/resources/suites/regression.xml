@@ -1,9 +1,11 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <suite name="Regression Suite" verbose="1">
+    <listeners>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+        <listener class-name="com.reports.AllureTestNgListener"/>
+        <listener class-name="com.testng.DisableRetryTransformer"/>
+    </listeners>
     <test name="Login Regression Tests">
-        <parameter name="env" value="qa"/>
-        <parameter name="browser" value="chrome"/>
-        <parameter name="platform" value="local"/>
         <groups>
             <run>
                 <include name="smoke"/>

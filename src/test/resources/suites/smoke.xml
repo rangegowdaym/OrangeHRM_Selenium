@@ -6,9 +6,6 @@
         <listener class-name="com.testng.DisableRetryTransformer"/>
     </listeners>
     <test name="Smoke Tests">
-        <parameter name="env" value="dev"/>
-        <parameter name="browser" value="chrome"/>
-        <parameter name="platform" value="local"/>
         <groups>
             <run>
                 <include name="smoke"/>

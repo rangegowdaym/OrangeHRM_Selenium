@@ -36,7 +36,11 @@ public abstract class BaseTest {
     @BeforeMethod(alwaysRun = true)
     @Parameters({"platform", "browser", "browserVersion"})
     public void setUp(@Optional String platform, @Optional String browser, @Optional String browserVersion) {
-        driver = DriverManager.getInstance().getDriver(platform, browser, browserVersion);
+        String resolvedPlatform = firstNonBlank(System.getProperty("platform"), platform, "local");
+        String resolvedBrowser = firstNonBlank(System.getProperty("browser"), browser, "chrome");
+        String resolvedBrowserVersion = firstNonBlank(System.getProperty("browserVersion"), browserVersion);
+
+        driver = DriverManager.getInstance().getDriver(resolvedPlatform, resolvedBrowser, resolvedBrowserVersion);
         testContext.setScreenshotHelper(driver);
         logStep("Driver initialized");
     }
@@ -64,5 +68,14 @@ public abstract class BaseTest {
 
     protected WebDriver getDriver() {
         return driver;
+    }
+
+    private String firstNonBlank(String... values) {
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+        return null;
     }
 }
