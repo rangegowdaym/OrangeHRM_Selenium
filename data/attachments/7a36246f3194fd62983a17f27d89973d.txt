@@ -1,0 +1,2 @@
+Asserting login page is fully loaded with branding visible
+Login page load verified successfully
