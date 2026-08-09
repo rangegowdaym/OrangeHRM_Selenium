@@ -20,7 +20,4 @@ echo ============================================
 echo  Opening Allure Report
 echo ============================================
 
-npx --yes allure open target/allure-report/awesome
-
-pause
-endlocal
+npx --yes allure open target/allure-report

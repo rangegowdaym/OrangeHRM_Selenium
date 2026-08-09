@@ -30,6 +30,6 @@ echo "============================================"
 echo " Opening Allure Report"
 echo "============================================"
 
-npx --yes allure open target/allure-report/awesome
+npx --yes allure open target/allure-report
 
 exit $TEST_EXIT_CODE
