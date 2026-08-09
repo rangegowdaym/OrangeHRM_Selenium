@@ -57,7 +57,7 @@ jobs:
             image: selenium/standalone-edge:latest
     container:
       image: ${{ matrix.image }}
-      options: --shm-size=2g
+      options: --shm-size=2g --user root
 
     env:
       SUITE: ${{ github.event_name == 'workflow_dispatch' && inputs.suite || 'smoke' }}
