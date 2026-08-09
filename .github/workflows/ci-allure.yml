@@ -41,20 +41,60 @@ permissions:
   contents: write
 
 jobs:
+  resolve-linux-matrix:
+    name: Resolve Linux browser matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_linux: ${{ steps.set-matrix.outputs.has_linux }}
+    steps:
+      - name: Build browser matrix
+        id: set-matrix
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DISPATCH_BROWSER: ${{ inputs.browser }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            selected_browser="$DISPATCH_BROWSER"
+          else
+            selected_browser="chrome"
+          fi
+
+          case "$selected_browser" in
+            all)
+              echo 'matrix={"include":[{"browser":"chrome","image":"selenium/standalone-chrome:latest"},{"browser":"firefox","image":"selenium/standalone-firefox:latest"},{"browser":"edge","image":"selenium/standalone-edge:latest"}]}' >> "$GITHUB_OUTPUT"
+              echo "has_linux=true" >> "$GITHUB_OUTPUT"
+              ;;
+            chrome)
+              echo 'matrix={"include":[{"browser":"chrome","image":"selenium/standalone-chrome:latest"}]}' >> "$GITHUB_OUTPUT"
+              echo "has_linux=true" >> "$GITHUB_OUTPUT"
+              ;;
+            firefox)
+              echo 'matrix={"include":[{"browser":"firefox","image":"selenium/standalone-firefox:latest"}]}' >> "$GITHUB_OUTPUT"
+              echo "has_linux=true" >> "$GITHUB_OUTPUT"
+              ;;
+            edge)
+              echo 'matrix={"include":[{"browser":"edge","image":"selenium/standalone-edge:latest"}]}' >> "$GITHUB_OUTPUT"
+              echo "has_linux=true" >> "$GITHUB_OUTPUT"
+              ;;
+            safari)
+              echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
+              echo "has_linux=false" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Unsupported browser input: $selected_browser"
+              exit 1
+              ;;
+          esac
+
   test-linux:
     name: Test (${{ matrix.browser }})
+    needs: resolve-linux-matrix
     runs-on: ubuntu-latest
-    if: github.event_name != 'workflow_dispatch' || (github.event_name == 'workflow_dispatch' && inputs.browser != 'safari')
+    if: needs.resolve-linux-matrix.outputs.has_linux == 'true'
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - browser: chrome
-            image: selenium/standalone-chrome:latest
-          - browser: firefox
-            image: selenium/standalone-firefox:latest
-          - browser: edge
-            image: selenium/standalone-edge:latest
+      matrix: ${{ fromJSON(needs.resolve-linux-matrix.outputs.matrix) }}
     container:
       image: ${{ matrix.image }}
       options: --shm-size=2g --user root
@@ -78,9 +118,6 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build and run tests
-        if: |
-          (github.event_name != 'workflow_dispatch' && matrix.browser == 'chrome') ||
-          (github.event_name == 'workflow_dispatch' && (inputs.browser == 'all' || inputs.browser == matrix.browser))
         run: |
           ./gradlew clean test \
             -DsuiteXmlFile=${SUITE}.xml \
@@ -90,12 +127,7 @@ jobs:
             -Dplatform=local
 
       - name: Upload Allure results
-        if: |
-          always() &&
-          (
-            (github.event_name != 'workflow_dispatch' && matrix.browser == 'chrome') ||
-            (github.event_name == 'workflow_dispatch' && (inputs.browser == 'all' || inputs.browser == matrix.browser))
-          )
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results-${{ matrix.browser }}
@@ -104,12 +136,7 @@ jobs:
           retention-days: 14
 
       - name: Upload test reports
-        if: |
-          always() &&
-          (
-            (github.event_name != 'workflow_dispatch' && matrix.browser == 'chrome') ||
-            (github.event_name == 'workflow_dispatch' && (inputs.browser == 'all' || inputs.browser == matrix.browser))
-          )
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-reports-${{ matrix.browser }}
