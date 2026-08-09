@@ -245,7 +245,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-report/awesome
+          publish_dir: allure-report
           force_orphan: true
 
       - name: Upload built Allure report artifact
@@ -253,6 +253,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
-          path: allure-report/awesome
+          path: allure-report
           if-no-files-found: warn
           retention-days: 14
