@@ -67,6 +67,7 @@ public class DriverManager {
 
         return switch (EnvironmentType.valueOf(env)) {
             case SAUCE_LABS, BROWSER_STACK -> createRemoteDriver(env.toLowerCase(), browserType);
+            case GRID -> createGridDriver(browserType);
             default -> createLocalDriver(browserType);
         };
     }
@@ -105,6 +106,20 @@ public class DriverManager {
         }
     }
 
+    private WebDriver createGridDriver(BrowserType browserType) {
+        try {
+            AbstractDriverOptions<?> options = createRemoteOptions("grid", browserType);
+            String remoteUrl = firstNonBlank(
+                    System.getProperty("seleniumRemoteUrl"),
+                    ConfigReader.getString("selenium.remote.url"),
+                    "http://localhost:4444/wd/hub"
+            );
+            return new RemoteWebDriver(new URL(remoteUrl), options);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Invalid Selenium Grid URL", e);
+        }
+    }
+
     private AbstractDriverOptions<?> createRemoteOptions(String provider, BrowserType browserType) {
         AbstractDriverOptions<?> options = switch (browserType) {
             case CHROME -> new ChromeOptions();
@@ -128,7 +143,10 @@ public class DriverManager {
         if (platform != null && !platform.isBlank()) {
             options.setPlatformName(platform);
         }
-        options.setCapability("name", ConfigReader.getString(provider + ".testName"));
+        String testName = ConfigReader.getString(provider + ".testName");
+        if (testName != null && !testName.isBlank()) {
+            options.setCapability("name", testName);
+        }
         return options;
     }
 

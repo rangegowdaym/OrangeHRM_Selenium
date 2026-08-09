@@ -17,12 +17,12 @@ echo "============================================"
 echo " Generating Allure Report"
 echo "============================================"
 
-allure generate --report-name "Orange HRM Regression" --output target/allure-report target/allure-results
+npx --yes allure generate target/allure-results --output target/allure-report
 
 echo "============================================"
 echo " Opening Allure Report"
 echo "============================================"
 
-allure open target/allure-report
+npx --yes allure open target/allure-report
 
 exit $TEST_EXIT_CODE

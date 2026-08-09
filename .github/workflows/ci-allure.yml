@@ -124,7 +124,8 @@ jobs:
             -Dgroups=${SUITE} \
             -Denv=${TEST_ENV} \
             -Dbrowser=${{ matrix.browser }} \
-            -Dplatform=local
+            -Dplatform=grid \
+            -DseleniumRemoteUrl=http://localhost:4444/wd/hub
 
       - name: Upload Allure results
         if: always()
@@ -221,12 +222,8 @@ jobs:
           path: allure-results
           merge-multiple: true
 
-      - name: Build Allure report
-        uses: simple-elf/allure-report-action@master
-        with:
-          allure_results: allure-results
-          allure_report: allure-report
-          gh_pages: allure-history
+      - name: Build Allure 3 report
+        run: npx --yes allure generate allure-results
 
       - name: Publish report to GitHub Pages
         if: github.event_name != 'pull_request'
@@ -234,7 +231,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-history
+          publish_dir: allure-report/awesome
           force_orphan: true
 
       - name: Upload built Allure report artifact
@@ -242,6 +239,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
-          path: allure-report
+          path: allure-report/awesome
           if-no-files-found: warn
           retention-days: 14

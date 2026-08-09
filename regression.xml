@@ -10,7 +10,14 @@
             </run>
         </groups>
         <classes>
-            <class name="com.testsuites.LoginTest"/>
+            <class name="com.testsuites.LoginTest">
+                <methods>
+                    <include name="testInvalidCredentialsShowError"/>
+                    <include name="testEmptyCredentialsShowError"/>
+                    <include name="testEmptyUsernameShowsError"/>
+                    <include name="testEmptyPasswordShowsError"/>
+                </methods>
+            </class>
         </classes>
     </test>
 </suite>
