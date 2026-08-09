@@ -149,7 +149,7 @@ jobs:
           name: allure-results-${{ matrix.browser }}
           path: target/allure-results
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 7
 
       - name: Upload test reports
         if: always()
@@ -160,7 +160,7 @@ jobs:
             target/reports
             target/test-results
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 7
 
   allure-report:
     name: Publish Allure report
@@ -200,4 +200,4 @@ jobs:
           name: allure-report
           path: allure-report
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 7
